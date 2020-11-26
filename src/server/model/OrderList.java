@@ -3,28 +3,34 @@ package server.model;
 import java.util.*;
 
 public class OrderList {
-
-	private LinkedHashSet <Order> orders;
 	
+	private LinkedHashSet <Order> orders;
+
 	public OrderList() {
 		orders= new LinkedHashSet <Order> ();
 	}
 	
-	public void addOrder(Order o) {
-		orders.add(o);
+	public void addOrderLine(OrderLine ol) {
+		int id=ol.getOrderID();
+		Order a= searchID(id);
+		if (a==null)
+			orders.add(new Order(id, ol.getTool()));
+		else
+			a.addOrderLine(ol.getTool());
 	}
 	/**
 	 * generates a brand new id that has never been used before
 	 * @return 5 digit id as string
 	 */
-	public String newID() {
+	public int newID() {
 		while(true) {
-			String id =""; 
-			for(int i=0;i<5;i++)
-				id+=Integer.toString(new Random().nextInt(10));
 			
-			if(searchID(id) == null)
+			int id=new Random().nextInt(10000);
+			
+			if(searchID(id) == null) {
 				return id;
+			}
+				
 		}
 	}
 	
@@ -34,15 +40,12 @@ public class OrderList {
 	 * @param i Order to be ordered
 	 * @return order details as string
 	 */
-	public String newOrder(Tool i) {
-		//create temporary list of Order to create new order
-		LinkedHashSet <Tool> tempList= new LinkedHashSet <Tool> ();
-		tempList.add(i);
+	public int newOrder(Tool tool) {
 		
-		Order o= new Order(newID(),tempList);
+		Order o= new Order(newID(),tool);
 		
 		orders.add(o);
-		return o.toString();
+		return o.getOrderID();
 	}
 	
 	/**
@@ -50,10 +53,10 @@ public class OrderList {
 	 * @param id Order id as string
 	 * @return Order if found null if not
 	 */
-	public Order searchID(String id) {
+	public Order searchID(int id) {
 		
 		for (Order o: orders) {
-			if (o.getOrderID().equals(id)) return o;
+			if (o.getOrderID()==(id)) return o;
 		}
 		return null;
 	}
@@ -64,15 +67,15 @@ public class OrderList {
 	 * @param id Order id as string
 	 * @return completion message
 	 */
-	public String completeOrder(String id) {
+	public String completeOrder(int id) {
 		Order o = searchID(id); 
 		if(o != null) {
-			
-			o.setComplete(true);
+			o.completeOrder();
 			return "Success! Order Completed!";
 		}
 		else {
 			return "Error: Order Not Found!";
 		}
 	}
+	
 }

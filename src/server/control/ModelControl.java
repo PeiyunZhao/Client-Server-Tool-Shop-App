@@ -17,14 +17,31 @@ public class ModelControl implements Runnable{
 
 	private BufferedReader socketIn;
 	private PrintWriter socketOut;
-	private DatabaseControl databaseContorl;
-	private Model model;
-	private ArrayList<Supplier> suppliers;
+	private DatabaseControl databaseControl;
+	private Inventory inventory;
+	private SupplierList suppliers;
+
+	public ModelControl() {
+		databaseControl=new DatabaseControl(this);
+		run();
+	}
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void addTool(Tool t) {
+		inventory.addTool(t);
+	}
+	
+	public void addSupplier(Supplier s) {
+		suppliers.addSupplier(s);
+	}
+	
+	public void addOrder(OrderLine ol) {
+		inventory.addOrderLine(ol);
 	}
 
 }

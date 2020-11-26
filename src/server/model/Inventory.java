@@ -3,14 +3,14 @@ package server.model;
 import java.util.*;
 
 
-public class ToolList {
+public class Inventory {
 
-	private OrderList orders;
+	private OrderList orderList;
 	private LinkedHashSet <Tool> tools;
 	
-	public ToolList() {
+	public Inventory() {
 		tools= new LinkedHashSet<Tool> ();
-		orders = new OrderList(); 
+		orderList = new OrderList(); 
 	}
 	
 	/**
@@ -19,26 +19,28 @@ public class ToolList {
 	 * @param id Tool ID of tool to be decreased in quantity
 	 * @param n	Tool quantity will be decreased by n
 	 */
-	public String decrease(String id,int n) {
+	public String decrease(int id,int n) {
 
-		Tool i=searchID(id);
+		Tool tool=searchID(id);
 		
-		if (i==null) {
+		if (tool==null) {
 			return "not processed\n****** tool not found ******";
 		}
 		
 		else {
-		int q = i.getQuantity();
+		int q = tool.getQuantity();
 		if (n<=0) return "not processed\n****** invalid input ******";
 		if (n>q) return  "not processed\n****** not enough stock ******";
 		
-		i.decrease(n);
+		tool.decrease(n);
 		
-		if((q-n)<40&&i.getReorder()==0) {
-			i.setReorder(50-i.getQuantity());
+		if((q-n)<40&&tool.getReorder()==0) {
+			tool.setReorder(tool.getQuantity());
 			
-			String out="quantity decreased, order placed\n" + 
-						"****** Low Stock ******\n"+orders.newOrder(i);
+			int orderID=orderList.newOrder(tool);
+					
+			String out="quantity decreased, order Generated\n" + 
+						"****** Low Stock ******\n"+orderList.searchID(orderID).toString();
 			return out;
 		}
 		
@@ -74,9 +76,13 @@ public class ToolList {
 	 * 
 	 * @param id tool ID of tool to be removed
 	 */
-	public void removeTool(String id) {
+	public void removeTool(int id) {
 		Tool i= searchID(id);
 		tools.remove(i);
+	}
+	
+	public void addOrderLine(OrderLine ol) {
+		orderList.addOrderLine(ol);
 	}
 	
 	/**
@@ -84,10 +90,10 @@ public class ToolList {
 	 * @param str tool id input as string
 	 * @return tool if found null if not
 	 */
-	public Tool searchID(String str) {
+	public Tool searchID(int id) {
 		
-		for (Tool i: tools) {
-			if (i.getToolID().equals(str)) return i;
+		for (Tool t: tools) {
+			if (t.getID()==id) return t;
 		}
 		return null;
 	}

@@ -18,17 +18,16 @@ public class SupplierList {
 	suppliers.add(s);
 	}
 
-
 	/**
 	 * finds supplier with matching id
 	 * 
 	 * @param str supplier id input as String
 	 * @return supplier
 	 */
-	public Supplier searchID(String str) {
+	public Supplier searchID(int id) {
 		
 		for (Supplier s: suppliers) {
-			if (s.getSupID().equals(str))
+			if (s.getSupID()==id)
 				return s;
 		}
 		

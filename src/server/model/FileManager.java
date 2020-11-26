@@ -44,8 +44,8 @@ public class FileManager {
 		String row = csvReader.readLine();
 		while (row != null) {
 		    String[] data = row.split(";");
-		    Tool i= new Tool(data[0],data[1],Integer.parseInt(data[2]),
-		    		Double.parseDouble(data[3]),shop.findSupplierID(data[4]));
+		    Tool i= new Tool(Integer.parseInt(data[0]),data[1],Integer.parseInt(data[2]),
+		    		Double.parseDouble(data[3]),Integer.parseInt(data[4]));
 		    shop.addItem(i);
 		    
 		    row = csvReader.readLine();

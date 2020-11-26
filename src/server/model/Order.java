@@ -1,92 +1,54 @@
 package server.model;
-import java.util.Date;
-import java.util.LinkedHashSet;
+
+import java.util.*;
 
 public class Order {
 	
-	private LinkedHashSet <Tool> orderTools; 
+	private int orderID;
 	private Date date;
-	private String orderID;
-	private boolean complete = false;
 
-	public Order(String orderID, LinkedHashSet <Tool> tools) {
-		
-		orderTools= new LinkedHashSet <Tool>();
-		
-		this.orderID=orderID;
-		date= new Date();
-		
-		for (Tool i : tools) {
-			//a negative reorder integer indicates that the positive amount has been ordered.
-			if(i.getReorder()>0) {
-				i.setReorder(-i.getReorder());
-				orderTools.add(i);
-			}
-			else if (i.getQuantity()<40&&i.getReorder()==0) {
-				i.setReorder(i.getQuantity()-50);
-				orderTools.add(i);
-			}
-		}
+	private LinkedHashSet <OrderLine> orderlines;
+	
+	public Order(int id, Tool tool) {
+		orderlines= new LinkedHashSet <OrderLine> ();
+		this.orderID=id;
+		orderlines.add(new OrderLine(id, tool));
 	}
 	
-	/**
-	 * outputs order details and list of tools to be ordered
-	 * 
-	 * @output order placed
-	 */
-	public String toString() {
-		
-		String out= "Order ID:\t\t\t"+ orderID+
-				"\nDate:\t\t\t"+ date.toString();
-		
-		if (orderTools.size()==0) {
-			return out+"\nNo tools! Order made by Mistake! ";
-		}
-		
-		for (Tool i : orderTools) {
-			out+="\n\nTool Description:\t\t"+i.getName()+
-					"\nAmount Ordered:\t\t"+Integer.toString(-i.getReorder())+
-					"\nSupplier:\t\t\t "+i.getSup().getName();
-		}
-		return out;
+	public void addOrderLine(Tool tool) {
+		orderlines.add(new OrderLine(orderID,tool));
 	}
-	
-	//setters and getters
-	
-	public String getOrderID() {
+
+	public int getOrderID() {
 		return orderID;
 	}
-	public void setOrderID(String orderID) {
-		this.orderID = orderID;
+	
+	public void setDate(Date d) {
+		date=d;
 	}
 	
-	public LinkedHashSet<Tool> getTools() {
-		return orderTools;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public boolean isComplete() {
-		return complete;
-	}
-
 	/**
-	 * completes order and increases tool quantity by amount ordered.
+	 * completes Order based on id
 	 * 
-	 * @param complete completes order if set to true
+	 * @param id Order id as string
+	 * @return completion message
 	 */
-	public void setComplete(boolean complete) {
-		if (complete) {
-			for (Tool i : orderTools) {
-				i.setQuantity(i.getQuantity()-i.getReorder());
-				i.setReorder(0);
+	
+	public String completeOrder() {
+		if(!orderlines.isEmpty()) {
+			for (OrderLine o : orderlines) {
+				o.setComplete(true);
 			}
-			this.complete = complete;
+			return "Success! Order Completed!";
+		}
+		else {
+			return "Error: No OrderLines!";
 		}
 	}
+
+	public LinkedHashSet <OrderLine> getOrderLines() {
+		return orderlines;
+	}
+
+
 }

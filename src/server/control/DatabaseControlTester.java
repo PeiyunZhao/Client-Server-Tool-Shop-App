@@ -7,11 +7,12 @@ import java.sql.*;
 
 public class DatabaseControlTester {
 
+	
 	public static void main(String[] args) {
 
 		try {
 			//1. Get a connection  // ENTER PASSWORD to root BEFORE RUNNING
-			Connection myCon = DriverManager.getConnection("jdbc:mysql://localhost:3306/TOOLSHOP","root","<ENTER PASSWORD HERE>");
+			Connection myCon = DriverManager.getConnection("jdbc:mysql://localhost:3306/TOOLSHOP","root","Rosewoodd1211");
 			
 			//2. Write a statement
 			Statement myStmt=myCon.createStatement();

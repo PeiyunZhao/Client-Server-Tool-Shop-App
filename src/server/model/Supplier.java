@@ -2,10 +2,11 @@ package server.model;
 
 public class Supplier {
 	
-	private String supID;
+	private int supID;
 	private String name;
 	private String contact; 
 	private String address;
+	private String phone;
 	
 	/**
 	 * class representing supplier of items
@@ -15,11 +16,12 @@ public class Supplier {
 	 * @param address supplier location
 	 * @param contact name of contact with supplier
 	 */
-	public Supplier(String id, String name, String address ,String contact) {
+	public Supplier(int id, String name, String address ,String contact,String phone) {
 		this.setSupID(id);
 		this.setName(name);
 		this.setContact(contact);
 		this.setAddress(address);
+		this.setPhone(phone);
 	}
 	public String getAddress() {
 		return address;
@@ -45,12 +47,18 @@ public class Supplier {
 		this.name = name;
 	}
 
-	public String getSupID() {
+	public int getSupID() {
 		return supID;
 	}
 
-	public void setSupID(String supID) {
+	public void setSupID(int supID) {
 		this.supID = supID;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 }

@@ -65,7 +65,8 @@ public class storeMenu{
 	            case "4":  {
 	            	System.out.print("please enter toolID: ");
 	            	String str=s.next();
-	            	Tool tool=store.finditemID(str);
+	            	Tool
+	            	tool=store.finditemID(str);
 	            	if(tool==null) {
 	            		System.out.println("Tool not found");
 	            		break;

@@ -2,21 +2,21 @@ package server.model;
 
 public class Tool {
 	
-	private String toolID;
+	private int toolID;
 	private String name; 
 	private double price;
-	private Supplier sup;
+	private int supplierID;
 	private int quantity;
 	
 	//positive reorder indicates quantity that needs to be ordered
 	//negative reorder indicates quantity that has been ordered 
 	private int reorder=0;
 	
-	public Tool(String id, String name, int quantity, double price, Supplier sup ) {
-		this.setToolID(id);
+	public Tool(int id, String name, int quantity, double price, int sup ) {
+		this.setID(id);
 		this.setName(name);
 		this.setPrice(price);
-		this.setSup(sup);
+		this.setSupplierID(sup);
 		this.setQuantity(quantity);
 		
 	}
@@ -29,14 +29,14 @@ public class Tool {
 	 */
 	public String toString(){
 		String out = name +",\t$"+Double.toString(price)+",\tInstock: "+Integer.toString(quantity)
-				+ "\nTool ID: "+toolID+",\tSupplier ID:"+sup.getSupID()+"\n";
+				+ "\nTool ID: "+toolID+",\tSupplier ID:"+supplierID+"\n";
 		return out;
 	}
 	
-	public String getToolID() {
+	public int getID() {
 		return toolID;
 	}
-	public void setToolID(String toolID) {
+	public void setID(int toolID) {
 		this.toolID = toolID;
 	}
 	public String getName() {
@@ -51,11 +51,11 @@ public class Tool {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	public Supplier getSup() {
-		return sup;
+	public int getSupplierID() {
+		return supplierID;
 	}
-	public void setSup(Supplier sup) {
-		this.sup = sup;
+	public void setSupplierID(int sup) {
+		this.supplierID = sup;
 	}
 	public int getQuantity() {
 		return quantity;
