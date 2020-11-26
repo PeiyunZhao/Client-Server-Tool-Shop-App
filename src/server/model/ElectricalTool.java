@@ -9,8 +9,9 @@ public class ElectricalTool extends Tool{
 	}
 	
 	public String toString(){
-		String out = super.getName() +",\t$"+super.getPrice()+",\tInstock: "+super.getQuantity()+",\tPower: "+power
-				+ "\nTool ID: "+super.getID()+",\tSupplier ID:"+super.getSupplierID()+"\n";
+		String out = "ID: "+super.getID()+",\t"+ super.getName() +",  $"+Double.toString(super.getPrice())
+		+",  Stock: "+super.getQuantity()+
+		",  SupplierID: "+super.getSupplierID()+",  Power:"+power+"\n";
 		return out;
 	}
 	

@@ -37,22 +37,25 @@ public class DatabaseControl {
 
 			while(tools.next())
 			{
-				if (tools.getString("Ttype")=="R") {
+				if (tools.getString("Ttype").equals("R")) {
 					int id=tools.getInt("ToolID");
 					String name = tools.getString("Tname");
 					int quantity= tools.getInt("Quantity");
 					double price= tools.getDouble("Price");
 					int sid= tools.getInt("SupplierID");
 					Tool tool= new Tool( id, name, quantity, price, sid);
+//					System.out.print(tool);
 					modelControl.addTool(tool);
-				}else if (tools.getString("Ttype")=="E") {
+					
+				}else if (tools.getString("Ttype").equals("E")) {
 					int id=tools.getInt("ToolID");
 					String name = tools.getString("Tname");
 					int quantity= tools.getInt("Quantity");
 					double price= tools.getDouble("Price");
 					int sid= tools.getInt("SupplierID");
 					String power=tools.getString("PowerType");
-					Tool tool= new ElectricalTool( id, name, quantity, price, sid,power);
+					Tool tool= new ElectricalTool( id, name, quantity, price, sid, power);
+//					System.out.print(tool);
 					modelControl.addTool(tool);
 				}
 				
@@ -76,7 +79,7 @@ public class DatabaseControl {
 	
 			while(suppliers.next())
 			{
-				if (suppliers.getString("Stype")=="L") {
+				if (suppliers.getString("Stype").equals("L")) {
 					int id=suppliers.getInt("SupplierID");
 					String name = suppliers.getString("Sname");
 					String address = suppliers.getString("Address");
@@ -84,7 +87,7 @@ public class DatabaseControl {
 					String phone = suppliers.getString("Phone");
 					Supplier supplier= new Supplier( id, name,address, contact, phone);
 					modelControl.addSupplier(supplier);
-				}else if (suppliers.getString("Stype")=="I") {
+				}else if (suppliers.getString("Stype").equals("I")) {
 					int id=suppliers.getInt("SupplierID");
 					String name = suppliers.getString("Sname");
 					String address = suppliers.getString("Address");
@@ -100,6 +103,15 @@ public class DatabaseControl {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void loadFromDatabase() {
+//		System.out.println("Load Tools");
+		loadToolList();
+//		System.out.println("Load Orders");
+		loadOrderList();
+//		System.out.println("Load Suppliers");
+		loadSupplierList();
 	}
 
 }

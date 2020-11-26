@@ -22,14 +22,15 @@ public class ModelControl implements Runnable{
 	private SupplierList suppliers;
 
 	public ModelControl() {
-		databaseControl=new DatabaseControl(this);
+		setDatabaseControl(new DatabaseControl(this));
+		inventory= new Inventory();
+		suppliers = new SupplierList();
 		run();
 	}
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public void addTool(Tool t) {
@@ -44,4 +45,19 @@ public class ModelControl implements Runnable{
 		inventory.addOrderLine(ol);
 	}
 
+	public DatabaseControl getDatabaseControl() {
+		return databaseControl;
+	}
+
+	private void setDatabaseControl(DatabaseControl databaseControl) {
+		this.databaseControl = databaseControl;
+	}
+	
+	public String printAllTools() {
+		return inventory.printAllTools();
+	}
+
+	public String printAllSuppliers() {
+		return suppliers.printAllSuppliers();
+	}
 }

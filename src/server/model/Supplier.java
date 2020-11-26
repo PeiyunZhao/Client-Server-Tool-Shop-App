@@ -23,6 +23,15 @@ public class Supplier {
 		this.setAddress(address);
 		this.setPhone(phone);
 	}
+	
+	public String toString() {
+		String out= "ID: "+supID+",\t"+ name +", "+address+
+		",\n\t\tContact: " +contact+
+		", Phone: "+phone+"\n";
+		return out;
+	}
+	
+	
 	public String getAddress() {
 		return address;
 	}
@@ -60,5 +69,7 @@ public class Supplier {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+
+	
 
 }

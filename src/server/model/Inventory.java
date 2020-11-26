@@ -56,7 +56,7 @@ public class Inventory {
 	public String printAllTools() {
 		String out="";
 		for (Tool i :tools) {
-			out+=i.toString()+"\n";
+			out+=i.toString();
 		}
 		return out;
 	}
@@ -110,6 +110,13 @@ public class Inventory {
 		}
 		
 		return null;
+	}
+	public int getToolListSize(){
+		return tools.size();
+	}
+	
+	public int getOrderListSize(){
+		return orderList.size();
 	}
 	
 	

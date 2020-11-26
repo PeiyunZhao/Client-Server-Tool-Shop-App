@@ -78,4 +78,8 @@ public class OrderList {
 		}
 	}
 	
+	public int size(){
+		return orders.size();
+	}
+	
 }

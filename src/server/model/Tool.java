@@ -28,8 +28,9 @@ public class Tool {
 	 * @return tool details as String
 	 */
 	public String toString(){
-		String out = name +",\t$"+Double.toString(price)+",\tInstock: "+Integer.toString(quantity)
-				+ "\nTool ID: "+toolID+",\tSupplier ID:"+supplierID+"\n";
+		String out = "ID: "+toolID+",\t"+ name +",  $"+Double.toString(price)
+				+",  Stock: "+quantity+
+				",  SupplierID: "+supplierID+"\n";
 		return out;
 	}
 	

@@ -33,4 +33,16 @@ public class SupplierList {
 		
 		return null;
 	}
+	
+	public String printAllSuppliers() {
+		String out= "";
+		for (Supplier s : suppliers) {
+			out+=s.toString();
+		}
+		return out;
+	}
+	
+	public int size() {
+		return suppliers.size();
+	}
 }

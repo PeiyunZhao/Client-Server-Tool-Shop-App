@@ -15,5 +15,12 @@ public class InternationalSupplier extends Supplier{
 		this.importTax = importTax;
 	}
 	
+	public String toString() {
+		String out= "ID: "+super.getSupID()+",\t"+ super.getName() +", "+super.getAddress()+
+		",\n\t\tContact: " +super.getContact()+
+		", Phone: "+super.getPhone()+"  International Import Tax: "+getImportTax()+"\n";
+		return out;
+	}
+	
 
 }
