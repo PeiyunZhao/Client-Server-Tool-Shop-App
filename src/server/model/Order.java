@@ -1,20 +1,40 @@
 package server.model;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
 
 public class Order {
 	
 	private int orderID;
-	private Date date;
+	private LocalDate date;
 
 	private LinkedHashSet <OrderLine> orderlines;
+	
+	public Order(int id, LocalDate date) {
+		orderlines= new LinkedHashSet <OrderLine> ();
+		this.orderID=id;
+		setDate(date);
+	}
+	
 	
 	public Order(int id, Tool tool) {
 		orderlines= new LinkedHashSet <OrderLine> ();
 		this.orderID=id;
 		orderlines.add(new OrderLine(id, tool));
+		setDate(LocalDate.now());
 	}
 	
+	public boolean ifToolInOrder(Tool t) {
+		int id=t.getID();
+		
+		for (OrderLine ol : orderlines) {
+			if(id ==ol.getTool().getID())
+				return true;
+		}
+		return false;
+	}
+	
+
 	public void addOrderLine(Tool tool) {
 		orderlines.add(new OrderLine(orderID,tool));
 	}
@@ -23,7 +43,7 @@ public class Order {
 		return orderID;
 	}
 	
-	public void setDate(Date d) {
+	public void setDate(LocalDate d) {
 		date=d;
 	}
 	

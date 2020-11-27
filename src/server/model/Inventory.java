@@ -2,11 +2,14 @@ package server.model;
 
 import java.util.*;
 
+import server.control.ModelControl;
+
 
 public class Inventory {
 
 	private OrderList orderList;
 	private LinkedHashSet <Tool> tools;
+	private ModelControl modelControl;
 	
 	public Inventory() {
 		tools= new LinkedHashSet<Tool> ();
@@ -18,34 +21,44 @@ public class Inventory {
 	 * 
 	 * @param id Tool ID of tool to be decreased in quantity
 	 * @param n	Tool quantity will be decreased by n
+	 * 
+	 * @return 0 if processed -1 if process error or returns OrderID of order generated
 	 */
-	public String decrease(int id,int n) {
+	public int decrease(int id,int n) {
 
 		Tool tool=searchID(id);
 		
 		if (tool==null) {
-			return "not processed\n****** tool not found ******";
+			return -1;
 		}
-		
-		else {
-		int q = tool.getQuantity();
-		if (n<=0) return "not processed\n****** invalid input ******";
-		if (n>q) return  "not processed\n****** not enough stock ******";
-		
-		tool.decrease(n);
-		
-		if((q-n)<40&&tool.getReorder()==0) {
-			tool.setReorder(tool.getQuantity());
 			
-			int orderID=orderList.newOrder(tool);
-					
-			String out="quantity decreased, order Generated\n" + 
-						"****** Low Stock ******\n"+orderList.searchID(orderID).toString();
-			return out;
+		int q = tool.getQuantity();
+		
+		if (n<=0) return -1;
+		
+		if (n>q && (q-n) > 40) {
+			tool.decrease(n);
+			return  0;
 		}
 		
-		return "Tool found, quantity decreased\n";
+		
+		if((q-n)<40) {
+			if(tool.getReorder()==0) {
+				tool.setReorder(50-q-n);
+				tool.decrease(n);
+				
+				Order o =orderList.newOrder(tool);
+				
+				return o.getOrderID();
+			}
+			else if (tool.getReorder()!=0) {
+				tool.decrease(n);
+				return 0;
+			}
 		}
+		
+		return -1;
+		
 	}
 	
 	/**
@@ -69,6 +82,10 @@ public class Inventory {
 	 */
 	public void addTool(Tool i) {
 		tools.add(i);
+	}
+	
+	public void addOrder(Order o) {
+		orderList.addOrder(o);
 	}
 	
 	/**
@@ -117,6 +134,14 @@ public class Inventory {
 	
 	public int getOrderListSize(){
 		return orderList.size();
+	}
+
+	public ModelControl getModelControl() {
+		return modelControl;
+	}
+
+	public void setModelControl(ModelControl mc) {
+		this.modelControl = mc;
 	}
 	
 	

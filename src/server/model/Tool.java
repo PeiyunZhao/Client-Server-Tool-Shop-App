@@ -1,15 +1,13 @@
 package server.model;
 
-public class Tool {
+abstract public class Tool {
 	
 	private int toolID;
 	private String name; 
 	private double price;
 	private int supplierID;
 	private int quantity;
-	
-	//positive reorder indicates quantity that needs to be ordered
-	//negative reorder indicates quantity that has been ordered 
+	//positive reorder indicates quantity ordered
 	private int reorder=0;
 	
 	public Tool(int id, String name, int quantity, double price, int sup ) {
@@ -23,16 +21,8 @@ public class Tool {
 
 	//getters and setters
 	
-	/**
-	 * return tool details as string
-	 * @return tool details as String
-	 */
-	public String toString(){
-		String out = "ID: "+toolID+",\t"+ name +",  $"+Double.toString(price)
-				+",  Stock: "+quantity+
-				",  SupplierID: "+supplierID+"\n";
-		return out;
-	}
+
+	abstract public String toString();
 	
 	public int getID() {
 		return toolID;

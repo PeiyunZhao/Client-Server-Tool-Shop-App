@@ -8,6 +8,10 @@ public class ElectricalTool extends Tool{
 		this.setPower(power);
 	}
 	
+	/**
+	 * return tool details as string
+	 * @return tool details as String
+	 */
 	public String toString(){
 		String out = "ID: "+super.getID()+",\t"+ super.getName() +",  $"+Double.toString(super.getPrice())
 		+",  Stock: "+super.getQuantity()+

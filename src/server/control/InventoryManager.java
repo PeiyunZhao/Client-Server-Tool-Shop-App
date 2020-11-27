@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import server.model.RegularTool;
 import server.model.Tool;
 
 // Pre-Project Exercise 
@@ -20,7 +21,7 @@ import server.model.Tool;
 public class InventoryManager {
 	
 	public Connection jdbc_connection;
-	public Statement statement;
+	public PreparedStatement statement;
 	public String databaseName = "TOOLSHOP", tableName = "TOOL", dataFile = "tool.csv";
 	
 	// Students should configure these variables for their own MySQL environment
@@ -49,8 +50,9 @@ public class InventoryManager {
 	public void createDB()
 	{
 		try {
-			statement = jdbc_connection.createStatement();
-			statement.executeUpdate("CREATE DATABASE " + databaseName);
+			this.statement = jdbc_connection.prepareStatement("CREATE DATABASE "+databaseName);
+			statement.executeUpdate();
+			statement.close();
 			System.out.println("Created Database " + databaseName);
 		} 
 		catch( SQLException e)
@@ -66,16 +68,25 @@ public class InventoryManager {
 	//previously created
 	public void createTable()
 	{
-		String sql = "CREATE TABLE " + tableName + "(" +
-				     "ID INT(4) NOT NULL, " +
-				     "TOOLNAME VARCHAR(20) NOT NULL, " + 
-				     "QUANTITY INT(4) NOT NULL, " + 
-				     "PRICE DOUBLE(5,2) NOT NULL, " + 
-				     "SUPPLIERID INT(4) NOT NULL, " + 
-				     "PRIMARY KEY ( id ))";
+//		String sql = "CREATE TABLE " + tableName + "(" +
+//				     "ID INT(4) NOT NULL, " +
+//				     "TOOLNAME VARCHAR(20) NOT NULL, " + 
+//				     "QUANTITY INT(4) NOT NULL, " + 
+//				     "PRICE DOUBLE(5,2) NOT NULL, " + 
+//				     "SUPPLIERID INT(4) NOT NULL, " + 
+//				     "PRIMARY KEY ( id ))";
+		
+		String sql = "CREATE TABLE ? (ID INT(4) NOT NULL, " +
+			     "TOOLNAME VARCHAR(20) NOT NULL, " + 
+			     "QUANTITY INT(4) NOT NULL, " + 
+			     "PRICE DOUBLE(5,2) NOT NULL, " + 
+			     "SUPPLIERID INT(4) NOT NULL, " + 
+			     "PRIMARY KEY ( id ))";
 		try{
-			statement = jdbc_connection.createStatement();
-			statement.executeUpdate(sql);
+			statement = jdbc_connection.prepareStatement(sql);
+			statement.setString(1,tableName);
+			statement.executeUpdate();
+			statement.close();
 			System.out.println("Created Table " + tableName);
 		}
 		catch(SQLException e)
@@ -87,10 +98,12 @@ public class InventoryManager {
 	// Removes the data table from the database (and all the data held within it!)
 	public void removeTable()
 	{
-		String sql = "DROP TABLE " + tableName;
+		String sql = "DROP TABLE "+tableName;
 		try{
-			statement = jdbc_connection.createStatement();
-			statement.executeUpdate(sql);
+			this.statement = jdbc_connection.prepareStatement(sql);
+			statement.executeUpdate();
+			statement.close();
+			System.out.println("Created Table " + tableName);
 			System.out.println("Removed Table " + tableName);
 		}
 		catch(SQLException e)
@@ -107,7 +120,7 @@ public class InventoryManager {
 			while(sc.hasNext())
 			{
 				String toolInfo[] = sc.nextLine().split(";");
-				addItem( new Tool( Integer.parseInt(toolInfo[0]),
+				addItem( new RegularTool( Integer.parseInt(toolInfo[0]),
 						                            toolInfo[1],
 						           Integer.parseInt(toolInfo[2]),
 						         Double.parseDouble(toolInfo[3]),
@@ -128,15 +141,25 @@ public class InventoryManager {
 	// Add a tool to the database table
 	public void addItem(Tool tool)
 	{
-		String sql = "INSERT INTO " + tableName +
-				" VALUES ( " + tool.getID() + ", '" + 
-				tool.getName() + "', " + 
-				tool.getQuantity() + ", " + 
-				tool.getPrice() + ", " + 
-				tool.getSupplierID() + ");";
+//		String sql = "INSERT INTO " + tableName +
+//				" VALUES ( " + tool.getID() + ", '" + 
+//				tool.getName() + "', " + 
+//				tool.getQuantity() + ", " + 
+//				tool.getPrice() + ", " + 
+//				tool.getSupplierID() + ");";
+		
+		String sql = "INSERT INTO" +tableName+ "VALUES ( ?, '?', ?, ?, ?)";
+		
+
 		try{
-			statement = jdbc_connection.createStatement();
-			statement.executeUpdate(sql);
+			this.statement = jdbc_connection.prepareStatement(sql);
+			statement.setInt(1, tool.getID());
+			statement.setString(2, tool.getName());
+			statement.setInt(3, tool.getQuantity());
+			statement.setFloat(4, (float) tool.getPrice());
+			statement.setInt(5, tool.getSupplierID());
+			statement.executeUpdate();
+			statement.close();
 		}
 		catch(SQLException e)
 		{
@@ -148,14 +171,15 @@ public class InventoryManager {
 	// It should return null if no tools matching that ID are found.
 	public Tool searchTool(int toolID)
 	{
-		String sql = "SELECT * FROM " + tableName + " WHERE ToolID=" + toolID;
+		String sql = "SELECT * FROM "+tableName+" WHERE ToolID=?";
 		ResultSet tool;
 		try {
-			statement = jdbc_connection.createStatement();
-			tool = statement.executeQuery(sql);
+			this.statement = jdbc_connection.prepareStatement(sql);
+			statement.setInt(1,toolID);
+			tool = statement.executeQuery();
 			if(tool.next())
 			{
-				return new Tool(tool.getInt("ToolID"),
+				return new RegularTool(tool.getInt("ToolID"),
 								tool.getString("Tname"), 
 								tool.getInt("Quantity"), 
 								tool.getDouble("Price"), 
@@ -170,10 +194,11 @@ public class InventoryManager {
 	// Prints all the items in the database to console
 	public void printTable()
 	{
+	
 		try {
-			String sql = "SELECT * FROM " + tableName;
-			statement = jdbc_connection.createStatement();
-			ResultSet tools = statement.executeQuery(sql);
+			String sql = "SELECT * FROM "+tableName;
+			this.statement = jdbc_connection.prepareStatement(sql);
+			ResultSet tools = statement.executeQuery();
 			System.out.println("Tools:");
 			while(tools.next())
 			{
@@ -194,9 +219,9 @@ public class InventoryManager {
 		InventoryManager inventory = new InventoryManager();
 		
 		// You should comment this line out once the first database is created (either here or in MySQL workbench)
-		//inventory.createDB();
+//		inventory.createDB();
 
-		//inventory.createTable();
+//		inventory.createTable();
 		
 		//System.out.println("\nFilling the table with tools");
 		//inventory.fillTable();

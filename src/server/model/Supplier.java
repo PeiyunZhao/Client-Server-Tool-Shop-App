@@ -1,6 +1,6 @@
 package server.model;
 
-public class Supplier {
+abstract public class Supplier {
 	
 	private int supID;
 	private String name;
@@ -24,13 +24,7 @@ public class Supplier {
 		this.setPhone(phone);
 	}
 	
-	public String toString() {
-		String out= "ID: "+supID+",\t"+ name +", "+address+
-		",\n\t\tContact: " +contact+
-		", Phone: "+phone+"\n";
-		return out;
-	}
-	
+	abstract public String toString();
 	
 	public String getAddress() {
 		return address;

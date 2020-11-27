@@ -18,6 +18,27 @@ public class OrderList {
 		else
 			a.addOrderLine(ol.getTool());
 	}
+	
+	/**
+	 * adds order o to orderList or merges with existing Order if order pre-exists in list
+	 * 
+	 * @param o order to be added
+	 */
+	
+	public void addOrder(Order o) {
+		Order ordersearch=searchID(o.getOrderID());
+		if (ordersearch==null) {
+			orders.add(o);
+		}
+		else {
+			for(OrderLine ol : o.getOrderLines()) {
+				if(ordersearch.ifToolInOrder(ol.getTool())) {
+					ordersearch.addOrderLine(ol.getTool());
+				}
+			}
+			
+		}
+	}
 	/**
 	 * generates a brand new id that has never been used before
 	 * @return 5 digit id as string
@@ -38,14 +59,14 @@ public class OrderList {
 	 * creates new order based on a single Order
 	 * 
 	 * @param i Order to be ordered
-	 * @return order details as string
+	 * @return order 
 	 */
-	public int newOrder(Tool tool) {
+	public Order newOrder(Tool tool) {
 		
 		Order o= new Order(newID(),tool);
 		
 		orders.add(o);
-		return o.getOrderID();
+		return o;
 	}
 	
 	/**

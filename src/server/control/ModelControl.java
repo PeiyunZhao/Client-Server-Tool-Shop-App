@@ -13,36 +13,50 @@ import java.util.ArrayList;
 import server.model.*;
 
 
-public class ModelControl implements Runnable{
+public class ModelControl{
 
 	private BufferedReader socketIn;
 	private PrintWriter socketOut;
 	private DatabaseControl databaseControl;
 	private Inventory inventory;
 	private SupplierList suppliers;
+	private CustomerList customers;
 
-	public ModelControl() {
+	public ModelControl(BufferedReader Sin, PrintWriter Sout) {
+		socketIn=Sin;
+		socketOut=Sout;
 		setDatabaseControl(new DatabaseControl(this));
 		inventory= new Inventory();
 		suppliers = new SupplierList();
+		customers = new CustomerList();
 		run();
 	}
 	
-	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		databaseControl.loadFromDatabase();
+		
+		while(true && socketIn !=null && socketOut!=null){
+			
+		}
 	}
 	
-	public void addTool(Tool t) {
+	public void importTool(Tool t) {
 		inventory.addTool(t);
 	}
 	
-	public void addSupplier(Supplier s) {
+	public void importSupplier(Supplier s) {
 		suppliers.addSupplier(s);
 	}
 	
-	public void addOrder(OrderLine ol) {
+	public void importOrderLine(OrderLine ol) {
 		inventory.addOrderLine(ol);
+	}
+	
+	public void importOrder(Order o) {
+		inventory.addOrder(o);
+	}
+	public void importCustomer(Customer c) {
+		customers.addCustomer(c);
 	}
 
 	public DatabaseControl getDatabaseControl() {
@@ -59,5 +73,9 @@ public class ModelControl implements Runnable{
 
 	public String printAllSuppliers() {
 		return suppliers.printAllSuppliers();
+	}
+	
+	public String printAllCustomers() {
+		return customers.printAllCustomers();
 	}
 }
