@@ -164,6 +164,10 @@ public class Inventory {
 			}
 		}
 		return null;
+	}
+
+	public OrderList getOrderList() {
+		return orderList;
 	}	
 	
 }

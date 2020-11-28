@@ -11,7 +11,6 @@ public class DatabaseControl {
 	private ModelControl modelControl;
 	private Connection jdbc_connection;
 	private Statement statement;
-	private String databaseName = "TOOLSHOP", tableName = "TOOL", dataFile = "tool.csv";
 	private String connectionInfo = "jdbc:mysql://localhost:3306/TOOLSHOP",  
 			  login          = "root",
 			  password       = "Rosewoodd1211";
@@ -93,8 +92,6 @@ public class DatabaseControl {
 			{
 				int Oid=orderlines.getInt("OrderID");
 				int Tid=orderlines.getInt("ToolID");
-				int Sid = orderlines.getInt("SupplierID");
-				int quantity= orderlines.getInt("Quantity");
 				Tool tool = modelControl.getModel().getInventory().searchID(Tid);
 //				System.out.print(tool);
 				OrderLine orderline= new OrderLine(Oid, tool);
@@ -169,45 +166,110 @@ public class DatabaseControl {
 		}
 	}
 
-		public void removeTool(int id) {
-		
+	public void removeTool(int id) {
+
 		String sql = "DELETE FROM TOOL WHERE (ToolID = ?)";
 		try {
 			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
 			stmt.setInt(1, id);
 			stmt.executeUpdate();
-			
+
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}
-		
-		public void removeCustomer(int id) {
-			String sql = "DELETE FROM CLIENT WHERE (ClientlID = ?)";
-			try {
-				PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
-				stmt.setInt(1, id);
-				stmt.executeUpdate();
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+
+	public void addCustomer(int id) {
+		String sql="INSERT INTO CLIENT "+
+				"(`ClientID`, `Lname`, `Fname`, `Ctype`, `Phone`, `Address`, `PostalCode`) "+
+				"VALUES (?, ?, ?, ?, ?, ?, ?);";
+		try {
+			Customer c=modelControl.getModel().getCustomers().searchID(id);
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			stmt.setInt(1,c.getCustomerID());
+			stmt.setString(2,c.getLname());
+			stmt.setString(3,c.getFname());
+			stmt.setString(4,c.getType());
+			stmt.setString(5,c.getPhone());
+			stmt.setString(6,c.getAddress());
+			stmt.setString(7,c.getPostalCode());
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
 		}
+	}
+
+	public void removeCustomer(int id) {
+		String sql = "DELETE FROM CLIENT WHERE (ClientlID = ?)";
+		try {
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			stmt.setInt(1, id);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+
+	}	
+
+	public void addOrder(int id) {
+		String sql="INSERT INTO ORDERLINE (`OrderID`, `ToolID`, `SupplierID`, `Quantity`) VALUES (?, ?, ?, ?)";
+		try {
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			Order o = modelControl.getModel().getInventory().getOrderList().searchID(id);
+			for(OrderLine ol : o.getOrderLines()) {
+				stmt.setInt(1, ol.getToolID());
+				stmt.setInt(2, ol.getToolID());
+				stmt.setInt(3, ol.getTool().getSupplierID());
+				stmt.setInt(4, ol.getQuantity());
+				stmt.executeUpdate();
+			}
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+
+	}
+
+
+	public void updateToolReorder(int id) {
+
+		String sql= "UPDATE TOOL SET `Reorder` = ? WHERE (`ToolID` = ?);";
+		Tool tool=modelControl.getModel().getInventory().searchID(id);
 		
+		try {
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			stmt.setInt(1, tool.getReorder());
+			stmt.setInt(2,id);
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+	}
+
 	public void loadFromDatabase() {
-//		System.out.println("Load Tools");
+		//		System.out.println("Load Tools");
 		loadToolList();
-//		System.out.println("Load Suppliers");
+		//		System.out.println("Load Suppliers");
 		loadSupplierList();
-//		System.out.println("Load Customers");
+		//		System.out.println("Load Customers");
 		loadCustomerList();
-//		System.out.println("Load Orders");
+		//		System.out.println("Load Orders");
 		loadOrderList();
 		
 	}
+
+
+
+
+
 
 
 

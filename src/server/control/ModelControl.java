@@ -3,12 +3,6 @@ package server.control;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,7 +66,7 @@ public class ModelControl implements Runnable{
 	}
 	
 	private void execute(String func, String arg) {
-		// TODO Auto-generated method stub
+		
 		if(func.equals("ILA")) {
 			//Inventory List All Tools
 			
@@ -212,12 +206,12 @@ public class ModelControl implements Runnable{
 				str="processing error, invalid quantity input!";
 			}else if(res==0) {
 				str="Tool Quantity Updated, Stock left: "+(tool.getQuantity()-quantity);
-//				databaseControl.UpdateTool(id);//to be implemented in DatabaseControl
+				databaseControl.updateToolReorder(id);//to be implemented in DatabaseControl
 			}else {
 				str="Tool Ordered, Order ID: "+res;
 
-//				databaseControl.UpdateTool(id); //to be implemented in DatabaseControl
-//				databaseControl.addOrder(res);
+				databaseControl.updateToolReorder(id); //to be implemented in DatabaseControl
+				databaseControl.addOrder(res);
 			}
 			
 			
@@ -258,6 +252,7 @@ public class ModelControl implements Runnable{
 		refresh();
 		response1="Searching for Customer Type :"+arg;
 		socketOut.println(response1);
+		
 		LinkedHashSet<Customer> customers = model.getCustomers().searchType(arg);
 
 		return toJSON(customers);
@@ -267,18 +262,34 @@ public class ModelControl implements Runnable{
 		// func "CSI"
 		
 		refresh();
-		
+		response1="Updating Customer: ID :"+arg;
+		socketOut.println(response1);
 		try {
 			msg1=socketIn.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Customer c= new Gson().fromJson(msg1,Customer.class);
 		
-		response1="Customer profile updated, ID :"+arg;
-		socketOut.println(response1);
+		String str="";
 		
-		Customer customer = model.getCustomers().searchID(Integer.parseInt(arg));
-		return toJSON(customer);
+		Customer customer=model.getCustomers().searchID(Integer.parseInt(arg));
+		
+		if (customer!=null) {
+
+			model.getCustomers().deleteCustomerID(c.getCustomerID());
+			model.getCustomers().addCustomer(c);
+			
+			customer = model.getCustomers().searchID(Integer.parseInt(arg));
+			
+			str="Customer profile updated, ID: "+arg;
+			
+		}else {
+			str="Customer does not exist in system, ID: "+arg;
+		}
+		
+		return str;
+		
 	}
 	
 	public String customerAddId(String arg){
@@ -286,6 +297,8 @@ public class ModelControl implements Runnable{
 		
 		refresh();
 		response1="Adding Customer ID :"+arg;
+		socketOut.println(response1);
+		
 		
 		try {
 			msg1=socketIn.readLine();
@@ -317,6 +330,8 @@ public class ModelControl implements Runnable{
 		
 		refresh();
 		response1="Deleting Customer ID :"+arg;
+		socketOut.println(response1);
+		
 		Customer customer = model.getCustomers().deleteCustomerID(Integer.parseInt(arg));
 		String str="";
 		if (customer!=null) {

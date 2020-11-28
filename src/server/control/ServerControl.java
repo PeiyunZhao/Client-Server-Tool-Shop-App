@@ -14,7 +14,6 @@ public class ServerControl {
 	private ServerSocket serverSocket;
 	private PrintWriter socketOut;
 	private BufferedReader socketIn;
-	private ModelControl mc;
 	private ExecutorService pool;
 
 	public ServerControl(int port) {
