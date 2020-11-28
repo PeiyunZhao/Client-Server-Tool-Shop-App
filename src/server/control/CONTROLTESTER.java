@@ -12,10 +12,10 @@ public class CONTROLTESTER {
 		PrintWriter sout = null;
 		
 		ModelControl mc = new ModelControl(sin,sout);
-//		System.out.println(mc.printAllTools());
-//		System.out.println(mc.printAllSuppliers());
-//		System.out.println(mc.printAllCustomers());
-		
+//		System.out.println(mc.getModel().printAllTools());
+//		System.out.println(mc.getModel().printAllSuppliers());
+//		System.out.println(mc.getModel().printAllCustomers());
+		System.out.println(mc.getModel().printAllOrders());	
 	}
 }
 

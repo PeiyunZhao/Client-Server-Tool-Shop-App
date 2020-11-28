@@ -124,7 +124,8 @@ public class InventoryManager {
 						                            toolInfo[1],
 						           Integer.parseInt(toolInfo[2]),
 						         Double.parseDouble(toolInfo[3]),
-						           Integer.parseInt(toolInfo[4])) );
+						           Integer.parseInt(toolInfo[4]),
+						           Integer.parseInt(toolInfo[5])) );
 			}
 			sc.close();
 		}
@@ -183,7 +184,8 @@ public class InventoryManager {
 								tool.getString("Tname"), 
 								tool.getInt("Quantity"), 
 								tool.getDouble("Price"), 
-								tool.getInt("SupplierID"));
+								tool.getInt("SupplierID"),
+								tool.getInt("Reorder"));
 			}
 		
 		} catch (SQLException e) { e.printStackTrace(); }

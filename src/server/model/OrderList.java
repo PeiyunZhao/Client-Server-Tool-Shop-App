@@ -5,9 +5,11 @@ import java.util.*;
 public class OrderList {
 	
 	private LinkedHashSet <Order> orders;
-
-	public OrderList() {
+	private Inventory inventory;
+	
+	public OrderList(Inventory i) {
 		orders= new LinkedHashSet <Order> ();
+		setInventory(i);
 	}
 	
 	public void addOrderLine(OrderLine ol) {
@@ -26,17 +28,18 @@ public class OrderList {
 	 */
 	
 	public void addOrder(Order o) {
+		
 		Order ordersearch=searchID(o.getOrderID());
-		if (ordersearch==null) {
-			orders.add(o);
-		}
-		else {
+		
+		if (ordersearch!=null) {
 			for(OrderLine ol : o.getOrderLines()) {
-				if(ordersearch.ifToolInOrder(ol.getTool())) {
+				if(!ordersearch.ifToolInOrder(ol.getTool())) {
 					ordersearch.addOrderLine(ol.getTool());
 				}
 			}
-			
+		}
+		else {
+			orders.add(o);
 		}
 	}
 	/**
@@ -101,6 +104,27 @@ public class OrderList {
 	
 	public int size(){
 		return orders.size();
+	}
+
+	public String printAllOrders() {
+		String out = "";
+		for(Order o : orders) {
+			out+=o.toString();
+		}
+		return out;
+	}
+
+	public Inventory getInventory() {
+		return inventory;
+	}
+	
+	public int length() {
+		return orders.size();
+	}
+	
+
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
 	}
 	
 }

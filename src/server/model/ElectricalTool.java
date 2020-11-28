@@ -3,8 +3,8 @@ package server.model;
 public class ElectricalTool extends Tool{
 
 	private String power;
-	public ElectricalTool(int id, String name, int quantity, double price, int sup,String power) {
-		super(id, name, quantity, price, sup);
+	public ElectricalTool(int id, String name, int quantity, double price, int sup, int reorder,String power) {
+		super(id, name, quantity, price, sup,reorder);
 		this.setPower(power);
 	}
 	

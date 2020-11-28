@@ -31,16 +31,21 @@ public class ClientControl {
 		
 	}
 	public void communicate () {
-		String line = "";
-		String response = "";
+		String msg1 = "";
+		String msg2 = "";
+		String response1 ="";
+		String response2 = "";
 		
-		while (!line.equals("QUIT")) {
+		while (!msg1.equals("QUIT")) {
 			System.out.println("Enter a word to capitalize or type QUIT to end:");
 			try {
-				line = stdIn.readLine();
-				socketOut.println(line);
-				response = socketIn.readLine();  //read response form the socket
-				System.out.println("The response is: "+ response);
+				msg1 = stdIn.readLine();
+				socketOut.println(msg1);
+//				String option = msg1.split(" ")[1];
+//				
+//				response1 = socketIn.readLine();  //read item sent back from socket
+				response2 = socketIn.readLine(); // read message sent back from socket
+				System.out.println("The response is: \n"+ response2);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

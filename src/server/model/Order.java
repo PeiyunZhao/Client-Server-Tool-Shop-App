@@ -65,6 +65,16 @@ public class Order {
 			return "Error: No OrderLines!";
 		}
 	}
+	
+	public String toString() {
+		String out = "" ;
+		out += "Order: "+orderID+"  Date: "+date.toString()+"\n" ;
+		for(OrderLine ol : orderlines) {
+			out += ol.toString();
+		}
+		return out;
+		
+	}
 
 	public LinkedHashSet <OrderLine> getOrderLines() {
 		return orderlines;

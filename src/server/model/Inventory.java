@@ -13,7 +13,7 @@ public class Inventory {
 	
 	public Inventory() {
 		tools= new LinkedHashSet<Tool> ();
-		orderList = new OrderList(); 
+		orderList = new OrderList(this); 
 	}
 	
 	/**
@@ -74,6 +74,11 @@ public class Inventory {
 		return out;
 	}
 	
+	public String printAllOrders() {
+		
+		return orderList.printAllOrders();
+	}
+	
 	/**
 	 * adds tool to list of tools
 	 * 
@@ -86,6 +91,10 @@ public class Inventory {
 	
 	public void addOrder(Order o) {
 		orderList.addOrder(o);
+	}	
+	
+	public void addOrderLine(OrderLine ol) {
+		orderList.addOrderLine(ol);
 	}
 	
 	/**
@@ -98,10 +107,7 @@ public class Inventory {
 		tools.remove(i);
 	}
 	
-	public void addOrderLine(OrderLine ol) {
-		orderList.addOrderLine(ol);
-	}
-	
+
 	/**
 	 * searches for tool based on tool ID
 	 * @param str tool id input as string
@@ -142,7 +148,6 @@ public class Inventory {
 
 	public void setModelControl(ModelControl mc) {
 		this.modelControl = mc;
-	}
-	
+	}	
 	
 }

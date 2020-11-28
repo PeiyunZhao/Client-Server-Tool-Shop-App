@@ -10,55 +10,61 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import server.model.*;
 
 
-public class ModelControl{
+public class ModelControl implements Runnable{
 
 	private BufferedReader socketIn;
 	private PrintWriter socketOut;
 	private DatabaseControl databaseControl;
-	private Inventory inventory;
-	private SupplierList suppliers;
-	private CustomerList customers;
+
+	private Model model;
 
 	public ModelControl(BufferedReader Sin, PrintWriter Sout) {
+		
 		socketIn=Sin;
 		socketOut=Sout;
 		setDatabaseControl(new DatabaseControl(this));
-		inventory= new Inventory();
-		suppliers = new SupplierList();
-		customers = new CustomerList();
-		run();
+		setModel(new Model(this));
+		databaseControl.loadFromDatabase();
 	}
 	
+	public void refresh() {
+		setDatabaseControl(new DatabaseControl(this));
+		setModel(new Model(this));
+		databaseControl.loadFromDatabase();
+	}
+	
+	@Override
 	public void run() {
 		databaseControl.loadFromDatabase();
-		
-		while(true && socketIn !=null && socketOut!=null){
-			
+		String msg1 = "";
+		String msg2 = "";
+		String response1 = "";
+		String response2 = "";
+		while(true){
+			try {
+//				System.out.println("reading from socket....");		//for debugging		
+				msg1 = socketIn.readLine();
+				
+				
+				response2=msg1.toUpperCase();
+				
+//				System.out.println("print to socket....");	//for debugging	
+				
+				socketOut.println(response2);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public void importTool(Tool t) {
-		inventory.addTool(t);
-	}
-	
-	public void importSupplier(Supplier s) {
-		suppliers.addSupplier(s);
-	}
-	
-	public void importOrderLine(OrderLine ol) {
-		inventory.addOrderLine(ol);
-	}
-	
-	public void importOrder(Order o) {
-		inventory.addOrder(o);
-	}
-	public void importCustomer(Customer c) {
-		customers.addCustomer(c);
-	}
-
 	public DatabaseControl getDatabaseControl() {
 		return databaseControl;
 	}
@@ -66,16 +72,28 @@ public class ModelControl{
 	private void setDatabaseControl(DatabaseControl databaseControl) {
 		this.databaseControl = databaseControl;
 	}
-	
-	public String printAllTools() {
-		return inventory.printAllTools();
+
+	public Model getModel() {
+		return model;
 	}
 
-	public String printAllSuppliers() {
-		return suppliers.printAllSuppliers();
+	public void setModel(Model model) {
+		this.model = model;
 	}
 	
-	public String printAllCustomers() {
-		return customers.printAllCustomers();
+	private String toJSON(Object o) {
+		ObjectMapper mapper = new ObjectMapper();
+		String json = "";
+		try {
+			json = mapper.writeValueAsString(o);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return json;
+	}
+	
+	public String performOption(String func, String arg) {
+		
+		return "Undetermined Function Call";
 	}
 }

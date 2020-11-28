@@ -10,12 +10,13 @@ abstract public class Tool {
 	//positive reorder indicates quantity ordered
 	private int reorder=0;
 	
-	public Tool(int id, String name, int quantity, double price, int sup ) {
+	public Tool(int id, String name, int quantity, double price, int sup, int reorder ) {
 		this.setID(id);
 		this.setName(name);
 		this.setPrice(price);
 		this.setSupplierID(sup);
 		this.setQuantity(quantity);
+		this.setReorder(reorder);
 		
 	}
 

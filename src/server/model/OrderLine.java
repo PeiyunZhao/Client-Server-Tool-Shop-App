@@ -10,16 +10,6 @@ public class OrderLine {
 	private Tool tool;
 	private boolean complete = false;
 	
-
-	public OrderLine(int orderID,int toolID, int supplierID, int quantity) {
-		
-		this.toolID=toolID;
-		this.orderID=orderID;
-		this.supplierID=supplierID;
-		this.quantity=quantity;
-
-	}
-	
 	public OrderLine (int orderID,Tool tool) {
 		
 		this.tool=tool;
@@ -28,6 +18,7 @@ public class OrderLine {
 		this.supplierID=tool.getSupplierID();
 		this.quantity=tool.getReorder();
 
+	
 	}
 	
 	/**
@@ -37,10 +28,8 @@ public class OrderLine {
 	 */
 	public String toString() {
 		
-		String out= "Order ID:\t\t\t"+ orderID;
-		out+="\n\nToolID:\t\t"+toolID+
-				"\nAmount Ordered:\t\t"+quantity+
-				"\nSupplier:\t\t\t "+supplierID+"\n";
+		String out = "\tToolName:  "+tool.getName()+"\tQuantity:  "+quantity+
+				"\tSupplier:  "+supplierID+"\n";
 		
 		return out;
 	}
@@ -58,6 +47,10 @@ public class OrderLine {
 	
 	public Tool getTool() {
 		return tool;
+	}
+	
+	public int getToolID() {
+		return toolID;
 	}
 
 	public boolean isComplete() {

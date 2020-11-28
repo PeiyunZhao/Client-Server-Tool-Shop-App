@@ -43,9 +43,10 @@ public class DatabaseControl {
 					int quantity= tools.getInt("Quantity");
 					double price= tools.getDouble("Price");
 					int sid= tools.getInt("SupplierID");
-					Tool tool= new RegularTool( id, name, quantity, price, sid);
+					int reorder= tools.getInt("Reorder");
+					Tool tool= new RegularTool( id, name, quantity, price, sid,reorder);
 //					System.out.print(tool);
-					modelControl.importTool(tool);
+					modelControl.getModel().importTool(tool);
 					
 				}else if (tools.getString("Ttype").equals("E")) {
 					int id=tools.getInt("ToolID");
@@ -53,10 +54,11 @@ public class DatabaseControl {
 					int quantity= tools.getInt("Quantity");
 					double price= tools.getDouble("Price");
 					int sid= tools.getInt("SupplierID");
+					int reorder= tools.getInt("Reorder");
 					String power=tools.getString("PowerType");
-					Tool tool= new ElectricalTool( id, name, quantity, price, sid, power);
+					Tool tool= new ElectricalTool( id, name, quantity, price, sid,reorder, power);
 //					System.out.print(tool);
-					modelControl.importTool(tool);
+					modelControl.getModel().importTool(tool);
 				}
 				
 			}
@@ -77,7 +79,8 @@ public class DatabaseControl {
 				int id=orders.getInt("OrderID");
 				LocalDate date = orders.getDate("Odate").toLocalDate();
 				Order order= new Order(id, date);
-				modelControl.importOrder(order);
+				modelControl.getModel().importOrder(order);
+				
 			}
 			orders.close();
 			
@@ -92,8 +95,10 @@ public class DatabaseControl {
 				int Tid=orderlines.getInt("ToolID");
 				int Sid = orderlines.getInt("SupplierID");
 				int quantity= orderlines.getInt("Quantity");
-				OrderLine orderline= new OrderLine(Oid, Tid, Sid, quantity);
-				modelControl.importOrderLine(orderline);
+				Tool tool = modelControl.getModel().getInventory().searchID(Tid);
+//				System.out.print(tool);
+				OrderLine orderline= new OrderLine(Oid, tool);
+				modelControl.getModel().importOrderLine(orderline);
 			}
 			orderlines.close();
 			
@@ -118,7 +123,7 @@ public class DatabaseControl {
 					String contact = suppliers.getString("Cname");
 					String phone = suppliers.getString("Phone");
 					Supplier supplier= new LocalSupplier( id, name,address, contact, phone);
-					modelControl.importSupplier(supplier);
+					modelControl.getModel().importSupplier(supplier);
 				}else if (suppliers.getString("Stype").equals("I")) {
 					int id=suppliers.getInt("SupplierID");
 					String name = suppliers.getString("Sname");
@@ -127,9 +132,8 @@ public class DatabaseControl {
 					String phone = suppliers.getString("Phone");
 					double importTax=suppliers.getDouble("ImportTax");
 					Supplier supplier= new InternationalSupplier( id, name,address, contact, phone,importTax);
-					modelControl.importSupplier(supplier);
+					modelControl.getModel().importSupplier(supplier);
 				}
-				
 			}
 			suppliers.close();
 		} catch (SQLException e) {
@@ -154,7 +158,7 @@ public class DatabaseControl {
 				String address = customers.getString("Address");
 				String postalCode = customers.getString("PostalCode");
 				Customer customer= new Customer(id, fname, lname, type, phone, address ,postalCode);
-				modelControl.importCustomer(customer);
+				modelControl.getModel().importCustomer(customer);
 				
 			}
 			customers.close();
@@ -162,16 +166,17 @@ public class DatabaseControl {
 			e.printStackTrace();
 		}
 	}
+
 	
 	public void loadFromDatabase() {
 //		System.out.println("Load Tools");
 		loadToolList();
-//		System.out.println("Load Orders");
-		loadOrderList();
 //		System.out.println("Load Suppliers");
 		loadSupplierList();
-		System.out.println("Load Customers");
+//		System.out.println("Load Customers");
 		loadCustomerList();
+//		System.out.println("Load Orders");
+		loadOrderList();
 		
 	}
 
