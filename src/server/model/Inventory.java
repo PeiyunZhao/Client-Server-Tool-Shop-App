@@ -148,6 +148,22 @@ public class Inventory {
 
 	public void setModelControl(ModelControl mc) {
 		this.modelControl = mc;
+	}
+
+	public LinkedHashSet <Tool>  getAllTools() {
+		return tools;
+	}
+
+	public Tool deleteToolID(int parseInt) {
+		Tool tool= null;
+		for(Tool t:tools) {
+			if(parseInt == t.getID()) {
+				tool=t;
+				tools.remove(t);
+				return tool;
+			}
+		}
+		return null;
 	}	
 	
 }

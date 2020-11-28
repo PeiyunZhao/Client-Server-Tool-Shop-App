@@ -141,6 +141,8 @@ public class DatabaseControl {
 		}
 	}
 	
+
+	
 	public void loadCustomerList() {
 		
 		try {
@@ -167,7 +169,34 @@ public class DatabaseControl {
 		}
 	}
 
-	
+		public void removeTool(int id) {
+		
+		String sql = "DELETE FROM TOOL WHERE (ToolID = ?)";
+		try {
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			stmt.setInt(1, id);
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
+		public void removeCustomer(int id) {
+			String sql = "DELETE FROM CLIENT WHERE (ClientlID = ?)";
+			try {
+				PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+				stmt.setInt(1, id);
+				stmt.executeUpdate();
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
 	public void loadFromDatabase() {
 //		System.out.println("Load Tools");
 		loadToolList();
@@ -179,5 +208,8 @@ public class DatabaseControl {
 		loadOrderList();
 		
 	}
+
+
+
 
 }
