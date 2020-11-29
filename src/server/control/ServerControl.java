@@ -14,7 +14,6 @@ public class ServerControl {
 	private ServerSocket serverSocket;
 	private PrintWriter socketOut;
 	private BufferedReader socketIn;
-	private ModelControl mc;
 	private ExecutorService pool;
 
 	public ServerControl(int port) {
@@ -30,6 +29,8 @@ public class ServerControl {
 	public void runServer() {
 		try {
 			while (true) {
+				
+				//creating sockets and run model control on thread
 				aSocket = serverSocket.accept();
 				System.out.println("Console at Server side says: Connection accepted by the server!");
 				socketIn = new BufferedReader(new InputStreamReader(aSocket.getInputStream()));

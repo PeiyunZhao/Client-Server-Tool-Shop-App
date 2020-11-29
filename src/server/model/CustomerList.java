@@ -45,4 +45,40 @@ public class CustomerList {
 	public int size() {
 		return customers.size();
 	}
+
+	public Customer deleteCustomerID(int parseInt) {
+		Customer customer= null;
+		for(Customer c:customers) {
+			if(parseInt == c.getCustomerID()) {
+				customer=c;
+				customers.remove(c);
+				return customer;
+			}
+		}
+		return null;
+	}
+
+	public LinkedHashSet<Customer> searchType(String arg) {
+		
+		LinkedHashSet<Customer> results = new LinkedHashSet<Customer>();
+		for(Customer c : customers) {
+			
+			if(c.getType().equals(arg))  results.add(c);
+			
+		}
+		return results;
+	}
+
+	public LinkedHashSet<Customer> searchName(String arg) {
+		
+		LinkedHashSet<Customer> results = new LinkedHashSet<Customer>();
+		for(Customer c : customers) {
+			
+			if(c.getFname().equals(arg) || c.getLname().equals(arg))  results.add(c);
+			
+		}
+		return results;
+	}
+
+	
 }

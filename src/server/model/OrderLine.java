@@ -69,5 +69,9 @@ public class OrderLine {
 		}
 		this.complete = complete;
 	}
+
+	public int getQuantity() {
+		return quantity;
+	}
 	
 }

@@ -1,5 +1,7 @@
 package server.model;
 
+import java.util.LinkedHashSet;
+
 import server.control.ModelControl;
 
 public class Model {
@@ -51,6 +53,10 @@ public class Model {
 	
 	public Inventory getInventory() {
 		return inventory;
+	}
+
+	public CustomerList getCustomers() {
+		return customers;
 	}
 
 }

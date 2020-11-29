@@ -1,3 +1,5 @@
+package client.view;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
