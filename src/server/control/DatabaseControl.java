@@ -180,12 +180,11 @@ public class DatabaseControl {
 		}
 	}
 
-	public void addCustomer(int id) {
+	public void addCustomer(Customer c) {
 		String sql="INSERT INTO CLIENT "+
 				"(`ClientID`, `Lname`, `Fname`, `Ctype`, `Phone`, `Address`, `PostalCode`) "+
 				"VALUES (?, ?, ?, ?, ?, ?, ?);";
 		try {
-			Customer c=modelControl.getModel().getCustomers().searchID(id);
 			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
 			stmt.setInt(1,c.getCustomerID());
 			stmt.setString(2,c.getLname());
@@ -203,7 +202,7 @@ public class DatabaseControl {
 	}
 
 	public void removeCustomer(int id) {
-		String sql = "DELETE FROM CLIENT WHERE (ClientlID = ?)";
+		String sql = "DELETE FROM CLIENT WHERE (`ClientID` = ?)";
 		try {
 			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
 			stmt.setInt(1, id);
@@ -218,17 +217,23 @@ public class DatabaseControl {
 
 	public void addOrder(int id) {
 		String sql="INSERT INTO ORDERLINE (`OrderID`, `ToolID`, `SupplierID`, `Quantity`) VALUES (?, ?, ?, ?)";
+		String sql2="INSERT INTO ORDERS (`OrderID`, `Odate`) VALUES (?,?)";
 		try {
 			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
 			Order o = modelControl.getModel().getInventory().getOrderList().searchID(id);
 			for(OrderLine ol : o.getOrderLines()) {
-				stmt.setInt(1, ol.getToolID());
+				stmt.setInt(1, ol.getOrderID());
 				stmt.setInt(2, ol.getToolID());
 				stmt.setInt(3, ol.getTool().getSupplierID());
 				stmt.setInt(4, ol.getQuantity());
 				stmt.executeUpdate();
 			}
-
+			PreparedStatement stmt2=jdbc_connection.prepareStatement(sql2);
+			LocalDate locald = LocalDate.now();
+			Date date = Date.valueOf(locald);
+			stmt2.setInt(1, o.getOrderID());
+			stmt2.setDate(2,date);
+			stmt2.executeUpdate();
 		} catch (SQLException e) {
 
 			e.printStackTrace();
@@ -239,13 +244,14 @@ public class DatabaseControl {
 
 	public void updateToolReorder(int id) {
 
-		String sql= "UPDATE TOOL SET `Reorder` = ? WHERE (`ToolID` = ?);";
+		String sql= "UPDATE TOOL SET `Quantity` = ?, `Reorder` = ? WHERE (`ToolID` = ?);";
 		Tool tool=modelControl.getModel().getInventory().searchID(id);
 		
 		try {
 			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
-			stmt.setInt(1, tool.getReorder());
-			stmt.setInt(2,id);
+			stmt.setInt(1, tool.getQuantity());
+			stmt.setInt(2, tool.getReorder());
+			stmt.setInt(3,id);
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
@@ -264,6 +270,26 @@ public class DatabaseControl {
 		//		System.out.println("Load Orders");
 		loadOrderList();
 		
+	}
+
+	public void addTool(Tool tool, String Ttype) {
+
+		String sql="INSERT INTO TOOL (`ToolID`, `Tname`, `Ttype`, `Quantity`, `Price`, `SupplierID`, `Reorder`) "
+				+"VALUES (?, ?, ?, ?, ?, ?, '0');\n";
+		try {
+			PreparedStatement stmt=jdbc_connection.prepareStatement(sql);
+			
+			stmt.setInt(1, tool.getID());
+			stmt.setString(2, tool.getName());
+			stmt.setString(3, Ttype);
+			stmt.setInt(4, tool.getQuantity());
+			stmt.setDouble(5, tool.getPrice());
+			stmt.setInt(6, tool.getSupplierID());
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 

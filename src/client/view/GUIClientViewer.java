@@ -17,6 +17,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+
+import client.control.ClientViewControl;
+
 import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
 import javax.swing.ButtonGroup;
@@ -47,29 +50,23 @@ public class GUIClientViewer {
 	private JLabel lblNewLabel_9;
 	private JLabel lblNewLabel_10;
 	private JLabel lblNewLabel_11;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GUIClientViewer window = new GUIClientViewer();
-					window.ClientManagementSystem.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private JTextArea textSearchResult;
+	
+	private JSpinner spinner;
+	private JRadioButton rdbtnClientID;
+	private JRadioButton rdbtnName;
+	private JRadioButton rdbtnType;
+	private ClientViewControl viewControl;
 
 	/**
 	 * Create the application.
+	 * @param cViewControl 
 	 */
-	public GUIClientViewer() {
+	public GUIClientViewer(ClientViewControl cViewControl) {
+		this.viewControl=cViewControl;
 		initializeComponents();
 		createEvents();
+		ClientManagementSystem.setVisible(true);
 		
 	}
 
@@ -80,42 +77,152 @@ public class GUIClientViewer {
 	private void createEvents() {
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(btnSave, "Do you really want to save?");
-				JOptionPane.showMessageDialog(null, "Successfully saved!");
-				textID.setText(textID.getText());
-				textFirstName.setText(textFirstName.getText());
-				textLastName.setText(textLastName.getText());
-				textAddress.setText(textAddress.getText());
-				textPostalCode.setText(textPostalCode.getText());
-				textPhoneNo.setText(textPhoneNo.getText());
+				String id=textField.getText();
+				String fname=textFirstName.getText();
+				String lname=textLastName.getText();
+				String address=textAddress.getText();
+				String postalCode=textPostalCode.getText();
+				String phone=textPhoneNo.getText();
+
+				if(isNumeric(id) && 
+						!fname.isBlank()&&
+						!lname.isBlank()&&
+						!address.isBlank()&&
+						!postalCode.isBlank()&&
+						!phone.isBlank()
+						) {
+					viewControl.sendMessage("CUI "+textField.getText());
+					String response1 = viewControl.retrieveResponse();
+					String type="";
+					if (spinner.getValue().equals("Residential")) {
+						type="R";
+					}else {
+						type="C";
+
+					}
+					viewControl.sendCustomer(id+","+fname+","+lname+","+type+","+address+","+postalCode+","+phone);
+					String response2 = viewControl.retrieveResponse();
+					textSearchResult.setText(response1+"\n"+response2);
+				}
+
 			}
 		});
 		
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(btnDelete, "Do you really want to delete?");
-				JOptionPane.showMessageDialog(null, "Successfully deleted!");
+				viewControl.sendMessage("CDI "+textField.getText());
+				String response1 = viewControl.retrieveResponse();
+				String response2 = viewControl.retrieveResponse();
+				textSearchResult.setText(response1+"\n"+response2);
 			}
 		});
 		
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(btnClear, "Do you really want to clear?");
-				JOptionPane.showMessageDialog(null, "Successfully Clear!");
+				textID.setText("");
+				textFirstName.setText("");
+				textLastName.setText("");
+				textAddress.setText("");
+				textPostalCode.setText("");
+				textPhoneNo.setText("");
+				spinner.setValue("Residential");
 			}
 		});
 		
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(btnSearch, "Start searching?");
+				
+				String out="";
+				String response1="";
+				
+				if (rdbtnClientID.isSelected()) {
+					viewControl.sendMessage("CSI "+textField.getText().trim());
+					response1=viewControl.retrieveResponse();
+					String str =viewControl.retrieveCustomer();
+					
+					if (str.equals("Customer Not Found")) 
+						out= "Customer Not Found";
+					else 
+						out = displayCustomer(str);
+					
+				} else if (rdbtnName.isSelected()) {
+					viewControl.sendMessage("CSN "+textField.getText().trim());
+					response1=viewControl.retrieveResponse();
+					out = viewControl.retrieveCustomers();
+					
+				} else if (rdbtnType.isSelected()) {
+					viewControl.sendMessage("CST "+textField.getText().trim());
+					response1=viewControl.retrieveResponse();
+					out = viewControl.retrieveCustomers();
+			
+				} else return;
+				
+				
+				textSearchResult.setText(response1+"\n"+ out);
+				
 			}
 		});
 		
 		btnClearSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(btnClear, "Do you want to clear search?");
+				textField.setText("");
+				textSearchResult.setText("");
+				
 			}
 		});
+	}
+	
+	
+	private String displayCustomer(String customer) {
+
+		textID.setText("");
+		textFirstName.setText("");
+		textLastName.setText("");
+		textAddress.setText("");
+		textPostalCode.setText("");
+		textPhoneNo.setText("");
+		spinner.setValue("Residential");
+
+		String[] list =customer.split(",");
+		String out="";
+		try {
+			out+="ID: "+list[0]+"  ";
+			out+="Name: "+list[1]+", ";
+			out+=" "+list[2]+"  ";
+			out+="Type: "+list[3]+"  ";
+			out+="Address: "+list[4]+" , ";
+			out+=list[5]+"  ";
+			out+="Phone: "+list[6]+"  ";
+			if(list[3].equals("R")) {
+				spinner.setValue("Residential");
+			}else {
+				spinner.setValue("Commercial");
+			}
+		}catch(ArrayIndexOutOfBoundsException err) {
+			out="Customer Not Found";
+		}
+
+		if(!out.equals("Commercial Not Found")) {
+			textID.setText(list[0]);
+			textFirstName.setText(list[1]);
+			textLastName.setText(list[2]);
+			textAddress.setText(list[4]);
+			textPostalCode.setText(list[5]);
+			textPhoneNo.setText(list[6]);
+		}
+		return out;
+	}
+
+	public boolean isNumeric(String strNum) {
+	    if (strNum == null|| strNum.equals("")) {
+	        return false;
+	    }
+	    try {
+	        double d = Double.parseDouble(strNum);
+	    } catch (NumberFormatException nfe) {
+	        return false;
+	    }
+	    return true;
 	}
 
 	//////////////////////////////////////////////////
@@ -168,23 +275,23 @@ public class GUIClientViewer {
 		
 		lblNewLabel_8 = new JLabel("Select type of search to be performed: ");
 		
-		JRadioButton rdbtnClientID = new JRadioButton("Client ID");
+		rdbtnClientID = new JRadioButton("Client ID");
 		buttonGroup.add(rdbtnClientID);
 		
-		JRadioButton rdbtnLastName = new JRadioButton("Last Name");
-		buttonGroup.add(rdbtnLastName);
-		rdbtnLastName.setToolTipText("International\r\nLocal");
+		rdbtnName = new JRadioButton("Name");
+		buttonGroup.add(rdbtnName);
+		rdbtnName.setToolTipText("International\r\nLocal");
 		
-		JRadioButton rdbtnClientType = new JRadioButton("Client Type");
-		buttonGroup.add(rdbtnClientType);
+		rdbtnType = new JRadioButton("Client Type");
+		buttonGroup.add(rdbtnType);
 		
 		separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
 		
 		lblNewLabel = new JLabel("Client type:");
 		
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerListModel(new String[] {"Select One", "Residential", "Commercial"}));
+		spinner = new JSpinner();
+		spinner.setModel(new SpinnerListModel(new String[] {"Residential", "Commercial"}));
 		
 		lblNewLabel_7 = new JLabel("Enter the search parameter below:");
 		
@@ -220,8 +327,8 @@ public class GUIClientViewer {
 											.addGap(68)
 											.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 												.addComponent(rdbtnClientID)
-												.addComponent(rdbtnLastName)
-												.addComponent(rdbtnClientType)))
+												.addComponent(rdbtnName)
+												.addComponent(rdbtnType)))
 										.addComponent(lblNewLabel_8)
 										.addComponent(lblNewLabel_7)
 										.addGroup(groupLayout.createSequentialGroup()
@@ -238,7 +345,7 @@ public class GUIClientViewer {
 									.addPreferredGap(ComponentPlacement.RELATED)))
 							.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
+								.addComponent(scrollPane)//, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(102)
@@ -295,7 +402,7 @@ public class GUIClientViewer {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(rdbtnClientID)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(rdbtnLastName))
+							.addComponent(rdbtnName))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(lblNewLabel_11)
 							.addGap(51)
@@ -334,7 +441,7 @@ public class GUIClientViewer {
 								.addComponent(btnDelete)
 								.addComponent(btnClear)))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(rdbtnClientType)
+							.addComponent(rdbtnType)
 							.addGap(18)
 							.addComponent(lblNewLabel_7)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -351,8 +458,8 @@ public class GUIClientViewer {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		
-		JTextArea textArea = new JTextArea();
-		scrollPane.setViewportView(textArea);
+		textSearchResult = new JTextArea();
+		scrollPane.setViewportView(textSearchResult);
 		ClientManagementSystem.getContentPane().setLayout(groupLayout);
 	}
 }

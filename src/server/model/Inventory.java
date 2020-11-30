@@ -31,16 +31,15 @@ public class Inventory {
 		if (tool==null) {
 			return -1;
 		}
-			
+		
 		int q = tool.getQuantity();
 		
-		if (n<=0) return -1;
+		if (n<=0 || q<n ) return -1;
 		
-		if (n>q && (q-n) > 40) {
+		if (q>n && (q-n)>40) {
 			tool.decrease(n);
 			return  0;
 		}
-		
 		
 		if((q-n)<40) {
 			if(tool.getReorder()==0) {

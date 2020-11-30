@@ -7,9 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-// TO BE CHANGED TO Client.model once finalized///////////////////////
-import server.model.*;
-
 public class ClientControl {
 	
 	private Socket aSocket;
@@ -28,14 +25,14 @@ public class ClientControl {
 		}catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
+	
+	//communicate method used for testing
 	public void communicate () {
 		String msg1 = "";
-		String msg2 = "";
 		String response1 ="";
 		String response2 = "";
 		
@@ -53,13 +50,12 @@ public class ClientControl {
 				response2 = socketIn.readLine(); // read message sent back from socket
 				System.out.println("The response is: \n"+ response2);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} //reading the input from the user (i.e. the keyboard);
 		}
 		closeSocket ();
-		
 	}
+	
 	private void closeSocket () {
 		
 		try {
@@ -67,18 +63,23 @@ public class ClientControl {
 			socketIn.close();
 			socketOut.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
-	
-	public static void main (String [] args) throws IOException {
-		
-		ClientControl aClient = new ClientControl ("localhost", 6666);
-		aClient.communicate();
-		
+	public PrintWriter getSocketOut() {
+		return socketOut;
 	}
+	public BufferedReader getSocketIn(){
+		return socketIn;
+	}
+	
+//	main method used int testing
+//	public static void main (String [] args) throws IOException {
+//		
+//		ClientControl aClient = new ClientControl ("localhost", 6666);
+////		aClient.communicate();
+//		
+//	}
 
 }

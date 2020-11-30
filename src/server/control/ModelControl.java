@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashSet;
 
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+
 
 import server.model.*;
 
@@ -54,13 +57,21 @@ public class ModelControl implements Runnable{
 					return;
 				}
 				
-				//decodes message to formulate response
-				execute(msg1.split(" ")[0],msg1.split(" ")[1]);
+				String arg=msg1.split(" ")[1];
+				String[] lis=msg1.split(" ");
+				for(int i=2; i<lis.length;i++) {
+					arg+=" "+lis[i];
+				}
+				
+				//decodes message to formulate response "ISN hammer"
+				execute(msg1.split(" ")[0],arg);
 				
 //				System.out.println("print to socket....");	//for debugging	
 
 			} catch (IOException e) {
 				e.printStackTrace();
+			}catch (NullPointerException e) {
+				return;
 			}
 		}
 	}
@@ -81,24 +92,30 @@ public class ModelControl implements Runnable{
 			socketOut.println(response2);
 			
 		} else if(func.equals("ISN")) {
-			//Inventory Search name
+			//Inventory Search Name
 			
 			response2 =inventorySearchName(arg);
 			socketOut.println(response2);
 					
-		} else if(func.equals("ICI")) {
-			//Inventory Check Quantity
+		}  else if(func.equals("IDQ")) {
+			//Inventory Decrease Quantity
 			
-			response2 =inventoryCheckId(arg);
+			response2 =inventoryDecreaseQuantity(arg);
 			socketOut.println(response2);
 			
-		} else if(func.equals("IDI")) {
+		}else if(func.equals("IDI")) {
 			//Inventory Delete ID
 			
-			response2 =inventoryDecreaseId(arg);
+			response2 =inventoryDeleteId(arg);
 			socketOut.println(response2);
 			
-		} else if(func.equals("CSI")) {
+		} else if(func.equals("IUI")) {
+			//Inventory Update ID
+			
+			response2 =inventoryUpdateId(arg);
+			socketOut.println(response2);
+			
+		}else if(func.equals("CSI")) {
 			//Customer Search ID
 			
 			response2 =customerSearchId(arg);
@@ -155,6 +172,8 @@ public class ModelControl implements Runnable{
 		response1="Searching for Tool ID :"+arg;
 		socketOut.println(response1);
 		Tool tool = model.getInventory().searchID(Integer.parseInt(arg));
+		
+		if (tool==null) return "Tool Not Found";
 
 		return toJSON(tool);
 	}
@@ -166,23 +185,16 @@ public class ModelControl implements Runnable{
 		response1="Searching for Tool Name :"+arg;
 		socketOut.println(response1);
 		Tool tool = model.getInventory().searchName(arg);
-
-		return toJSON(tool);
-	}
-	
-	public String inventoryCheckId(String arg){
-		// func "ICI"
 		
-		refresh();
-		response1="Checking Inventory on Tool ID :"+arg;
-		socketOut.println(response1);
-		Tool tool = model.getInventory().searchID(Integer.parseInt(arg));
+		if (tool!=null) return toJSON(tool);
+			
+		else return "Tool Not Found";
 
-		return toJSON(tool);
+		
 	}
 	
-	public String inventoryDecreaseId(String arg){
-		// func "IDI"
+	public String inventoryDecreaseQuantity(String arg){
+		// func "IDQ"
 		
 		refresh();
 		try {
@@ -191,21 +203,21 @@ public class ModelControl implements Runnable{
 			e.printStackTrace();
 		}
 		
-		response1="Decreasing Tool ID "+arg+" by : "+msg2;
+		response1="Decreasing Quantity for Tool ID "+arg+" by : "+msg2;
 		socketOut.println(response1);
 		
 		int id=Integer.parseInt(arg);
-		int quantity=Integer.parseInt(msg2);
+		int n=Integer.parseInt(msg2);
 		Tool tool = model.getInventory().searchID(id);
 
 		String str="";
 		if (tool!=null) {
 			
-			int res = model.getInventory().decrease(id, quantity);
+			int res = model.getInventory().decrease(id, n);
 			if (res==-1){
 				str="processing error, invalid quantity input!";
 			}else if(res==0) {
-				str="Tool Quantity Updated, Stock left: "+(tool.getQuantity()-quantity);
+				str="Tool Quantity Updated, Stock left: "+(tool.getQuantity()-n);
 				databaseControl.updateToolReorder(id);//to be implemented in DatabaseControl
 			}else {
 				str="Tool Ordered, Order ID: "+res;
@@ -218,9 +230,52 @@ public class ModelControl implements Runnable{
 			return str;
 			
 		}else {
-			str="Tool ID not found, No Tools Deleted.";
+			str="Tool ID not found, No Update.";
 			return str;
 		}
+		
+	}
+	
+	public String inventoryUpdateId(String arg){
+		// func "IUI"
+		
+		refresh();
+		response1="Updating Inventory: ID :"+arg;
+		socketOut.println(response1);
+		try {
+			msg1=socketIn.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JSONObject t = new JSONObject(msg1);
+		Tool tool=null;
+		if(t.has("power")) {
+			tool = new ElectricalTool(t.getInt("id"), t.getString("name"), t.getInt("quantity"), 
+					t.getDouble("price"), t.getInt("supplierID"), 0,t.getString("power"));
+			databaseControl.removeTool(tool.getID());
+			databaseControl.addTool(tool,"E");
+		}else {
+			tool= new RegularTool(t.getInt("id"), t.getString("name"), t.getInt("quantity"), 
+					t.getDouble("price"), t.getInt("supplierID"), 0);
+			databaseControl.removeTool(tool.getID());
+			databaseControl.addTool(tool,"R");
+		}
+		
+		return "Updated tool ID: "+tool.getID();
+		
+	}
+	
+	public String inventoryDeleteId(String arg){
+		// func "IDI"
+		
+		refresh();
+		response1="Deleting Inventory: ID :"+arg;
+		socketOut.println(response1);
+		
+		databaseControl.removeTool(Integer.parseInt(arg));
+			
+		return "Deleted tool ID: "+arg;
 		
 	}
 	
@@ -230,9 +285,12 @@ public class ModelControl implements Runnable{
 		refresh();
 		response1="Searching for Customer ID :"+arg;
 		socketOut.println(response1);
+		
 		Customer customer = model.getCustomers().searchID(Integer.parseInt(arg));
 
-		return toJSON(customer);
+		if (customer!=null) return toJSON(customer);
+		
+		else return "Customer Not Found";
 	}
 	
 	public String customerSearchName(String arg){
@@ -241,13 +299,16 @@ public class ModelControl implements Runnable{
 		refresh();
 		response1="Searching for Customer Name :"+arg;
 		socketOut.println(response1);
+		
 		LinkedHashSet<Customer> customers = model.getCustomers().searchName(arg);
 
+		if (customers.isEmpty()) return "Customer Not Found";
+		
 		return toJSON(customers);
 	}
 	
 	public String customerSearchType(String arg){
-		// func "CSN"
+		// func "CST"
 		
 		refresh();
 		response1="Searching for Customer Type :"+arg;
@@ -255,11 +316,13 @@ public class ModelControl implements Runnable{
 		
 		LinkedHashSet<Customer> customers = model.getCustomers().searchType(arg);
 
+		if (customers.isEmpty()) return "Customer Not Found";
+		
 		return toJSON(customers);
 	}
 	
 	public String customerUpdateId(String arg){
-		// func "CSI"
+		// func "CUI"
 		
 		refresh();
 		response1="Updating Customer: ID :"+arg;
@@ -270,59 +333,23 @@ public class ModelControl implements Runnable{
 			e.printStackTrace();
 		}
 		Customer c= new Gson().fromJson(msg1,Customer.class);
+
+		databaseControl.removeCustomer(c.getCustomerID());
+		databaseControl.addCustomer(c);
+		
+		
+		Customer temp = model.getCustomers().deleteCustomerID(Integer.parseInt(arg));
 		
 		String str="";
 		
-		Customer customer=model.getCustomers().searchID(Integer.parseInt(arg));
-		
-		if (customer!=null) {
-
-			model.getCustomers().deleteCustomerID(c.getCustomerID());
-			model.getCustomers().addCustomer(c);
-			
-			customer = model.getCustomers().searchID(Integer.parseInt(arg));
-			
-			str="Customer profile updated, ID: "+arg;
-			
-		}else {
-			str="Customer does not exist in system, ID: "+arg;
+		if (temp!=null) {
+		str="Customer profile updated, ID: "+arg;
 		}
-		
+		else {
+		str= "Customer profile added, ID: "+arg;
+		} 
 		return str;
 		
-	}
-	
-	public String customerAddId(String arg){
-		// func "CDI"
-		
-		refresh();
-		response1="Adding Customer ID :"+arg;
-		socketOut.println(response1);
-		
-		
-		try {
-			msg1=socketIn.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		Customer temp= new Gson().fromJson(msg1,Customer.class);
-		
-		String str="";
-		
-		Customer customer=model.getCustomers().searchID(Integer.parseInt(arg));
-		
-		if (customer!=null) {
-
-			str= "ERROR: Customer ID "+arg+" exists";
-		
-		}else {
-			model.getCustomers().addCustomer(temp);
-//			databaseControl.addCustomer(Integer.parseInt(arg));//to be implemented in DatabaseControl
-			str="Customer ID added.";
-		}
-		
-		return str;
 	}
 
 	public String customerDeleteId(String arg){
@@ -332,9 +359,10 @@ public class ModelControl implements Runnable{
 		response1="Deleting Customer ID :"+arg;
 		socketOut.println(response1);
 		
-		Customer customer = model.getCustomers().deleteCustomerID(Integer.parseInt(arg));
+		Customer temp = model.getCustomers().deleteCustomerID(Integer.parseInt(arg));
+		
 		String str="";
-		if (customer!=null) {
+		if (temp!=null) {
 			databaseControl.removeCustomer(Integer.parseInt(arg));
 			str= "Customer ID"+arg+" Deleted";
 		}else {
@@ -360,7 +388,7 @@ public class ModelControl implements Runnable{
 		this.model = model;
 	}
 	
-	private String toJSON(Object o) {
+	public String toJSON(Object o) {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = "";
 		try {
@@ -369,10 +397,5 @@ public class ModelControl implements Runnable{
 			e.printStackTrace();
 		}
 		return json;
-	}
-	
-	public String performOption(String func, String arg) {
-		
-		return "Undetermined Function Call";
 	}
 }
